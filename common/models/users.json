@@ -7,9 +7,8 @@
   },
   "properties": {
     "email": {
-      "type": {
-        "required": false
-      }
+      "type": "string",
+      "required": true
     },
     "username": {
       "type": "string",

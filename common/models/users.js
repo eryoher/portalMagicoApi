@@ -134,11 +134,11 @@ module.exports = function(Usuario) {
         description: 'to send email for recover password.',
     });
 
-    Usuario.emailToRecoverUser = async function (params) {        
+    Usuario.emailToRecoverUser = async function (params) {  
         let user, message
         let response = {success:true, message:''}
         try {
-            user = await Usuario.findOne({where:{...params}});        
+            user = await Usuario.findOne({where:{email:params.email}});                      
             if(!user){
                 response.message = 'El correo ingresado no se encuentra en el sistema.';                     
                 response.success = false
@@ -149,8 +149,7 @@ module.exports = function(Usuario) {
                     response.message = 'Se envio un correo con las intrucciones para recuperar la contraseña';                    
                     await sendRecoverEmail({ username:user.username, email:user.email, codeUrl:codeEmail});
                 }
-            }
-            
+            }            
             return response;
 
         } catch (error) {
