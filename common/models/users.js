@@ -207,7 +207,7 @@ module.exports = function(Usuario) {
 
     Usuario.changePasswordUser = async function (params) {        
         let user, message
-        let response = { message:'', success:true }
+        let response = { message:'', success:true }        
         try {
             user = await Usuario.findOne({where:{recoverCode:params.recoverCode}});        
             if(!user){
