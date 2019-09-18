@@ -68,6 +68,8 @@ module.exports = function(Notification) {
                         sendGiftCard( req, dataCard, preference.items[0].quantity ),
                         addQuantitytoPromotion(req, dataQuantity)
                     ])
+                }else{
+                    console.log(payment);
                 } 
             }
 
