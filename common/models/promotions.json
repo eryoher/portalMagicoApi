@@ -62,6 +62,14 @@
         "nestRemoting": true
       }
     },
+    "promotionsByUser": {
+      "type": "hasMany",
+      "model": "promotionsByUser",
+      "foreignKey": "",
+      "options": {
+        "nestRemoting": true
+      }
+    },
     "inventory": {
       "type": "hasMany",
       "model": "inventory",

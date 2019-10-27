@@ -79,6 +79,10 @@
   "AuthorizationCode": {
     "dataSource": "db",
     "public": true
+  },
+  "promotionsByUser": {
+    "dataSource": "db",
+    "public": true
   }
 
 }

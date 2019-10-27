@@ -1,0 +1,42 @@
+{
+    "name": "promotionsByUser",
+    "base": "PersistedModel",
+    "idInjection": true,
+    "options": {
+      "validateUpsert": true
+    },
+    "properties": {
+      "state": {
+        "type": "number",
+        "required": true
+      },
+      "quantity": {
+        "type": "number",
+        "required": true
+      },
+      "usersId":{
+        "type": "number",
+        "required": false
+      },
+      "promotionsId":{
+        "type": "number",
+        "required": false
+      }
+    },
+    "validations": [],
+    "relations": {
+      "promotions": {      
+        "type": "belongsTo",
+        "model": "promotions",
+        "foreignKey": "promotionsId"
+      },
+      "users": {      
+        "type": "belongsTo",
+        "model": "users",
+        "foreignKey": "usersId"
+      }
+    },
+    "acls": [],
+    "methods": {}
+  }
+  

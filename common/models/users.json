@@ -66,6 +66,14 @@
       "options": {
         "nestRemoting": true
       }
+    },
+    "promotionsByUser": {
+      "type": "hasMany",
+      "model": "promotionsByUser",
+      "foreignKey": "",
+      "options": {
+        "nestRemoting": true
+      }
     }    
   },
   "acls": [
