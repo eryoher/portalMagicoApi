@@ -3,8 +3,8 @@ const RESTUtils = require('../utils/RESTUtils');
 const ERROR_GENERIC = ' Error conexion con el servidor ';
 const GET_NOTIFICATION = 'Success';
 const Axios = require('axios');
-const TOKEN = 'TEST-4162175641553215-081420-696d25072b00310b8133f083cf544e71-236778780'; //SandBox
-const _TOKEN = 'APP_USR-4162175641553215-081420-b4177e24c5758a2e325198970908b2bf-236778780';
+const _TOKEN = 'TEST-4162175641553215-081420-696d25072b00310b8133f083cf544e71-236778780'; //SandBox
+const TOKEN = 'APP_USR-4162175641553215-081420-b4177e24c5758a2e325198970908b2bf-236778780';
 
 module.exports = function (Notification) {
     /**
