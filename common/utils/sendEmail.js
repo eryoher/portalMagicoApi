@@ -11,12 +11,16 @@ const sendBuyPromotionEmail = ( params ) => {
     
     readHTMLFile(__dirname + '/../../common/templates/template_buy_promotion_email.html', function(err, html) {            
         let template = handlebars.compile(html);            
-
+        const discount = parseFloat( params.promotion.discount / 100 );
+        const finalprice = parseFloat( params.promotion.price - parseFloat( params.promotion.price * discount ) );
         const replacements = {
             fullName: params.last_name,
             code: params.code,
             discount:params.promotion.discount,
-            promotion:params.promotion.name
+            promotion:params.promotion.name,
+            company:params.promotion.company.name, 
+            productprice:params.promotion.price,
+            finalprice: finalprice
         };
 
         const htmlToSend = template(replacements);          

@@ -6,25 +6,25 @@ const sendEmail = require('../utils/sendEmail');
 const CodeGenerator = require('../utils/CodeGenerator');
 
 
-module.exports = function(AuthorizationCode) {     
+module.exports = function (AuthorizationCode) {
 
     const generateCode = async function () {
-        
-        const  characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         const long = 8;
 
         try {
-            let pass = '';                
-            for (let index = 0; index < long; index++) {                       
-                pass += characters.charAt(Math.floor(Math.random()*characters.length));                   
+            let pass = '';
+            for (let index = 0; index < long; index++) {
+                pass += characters.charAt(Math.floor(Math.random() * characters.length));
             }
-            
-            return pass;            
+
+            return pass;
 
         } catch (error) {
             console.error(error);
-            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);       
-        }        
+            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);
+        }
     }
 
     /**
@@ -50,36 +50,70 @@ module.exports = function(AuthorizationCode) {
         },
     });
 
-    AuthorizationCode.createCode = async function (req, params) {        
-        
+    AuthorizationCode.createCode = async function (req, params) {
+
         try {
             let exists = null
-            let pass = '';            
-            const user = await AuthorizationCode.app.models.users.findOne({where:{email:params.email}});
+            let pass = '';
+            const user = await AuthorizationCode.app.models.users.findOne({ where: { email: params.email } });
             do {
-                pass = await CodeGenerator.generateCode(8);            
-                exists = await AuthorizationCode.findOne({where:{code:pass}});  //Se valida de que el codigo sea unico.            
-            } while (exists !== null );
-            const paramsTosave = { code:pass, promotionsId:params.promotion.id, usersId:user.id, status:'open' }
+                pass = await CodeGenerator.generateCode(8);
+                exists = await AuthorizationCode.findOne({ where: { code: pass } });  //Se valida de que el codigo sea unico.            
+            } while (exists !== null);
+            const paramsTosave = { code: pass, promotionsId: params.promotion.id, usersId: user.id, status: 'open' }
             const authorization = await AuthorizationCode.create(paramsTosave);
             //console.log(authorization, params);
-            if( authorization.id ){
-                sendEmail.sendBuyPromotionEmail({ code:authorization.code, ...params });                               
+            if (authorization.id) {
+                sendEmail.sendBuyPromotionEmail({ code: authorization.code, ...params });
             }
-            
-            return RESTUtils.buildSuccessResponse({data:authorization});                                  
+
+            return RESTUtils.buildSuccessResponse({ data: authorization });
 
         } catch (error) {
             console.error(error);
-            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);       
-        }        
+            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);
+        }
     }
 
-     /**
+    /**
      * To search promotions to admin form
      * @param {object} params data for search
      * @param {Function(Error, object)} callback
      */
+
+    AuthorizationCode.remoteMethod('getMyPromotions', {
+        accepts: [
+            { arg: 'req', type: 'object', http: { source: 'req' } },
+            { arg: 'params', type: 'object', 'description': 'create authorization code', 'http': { 'source': 'body' } },
+
+        ],
+        returns: {
+            type: 'object',
+            root: true,
+            description: 'response data of service'
+        },
+        description: 'Create Authorization Code',
+        http: {
+            verb: 'post'
+        },
+    });
+
+    AuthorizationCode.getMyPromotions = async function (req, params) {
+        try {                          
+            const promotions = await AuthorizationCode.find({ where: { ...params }, include: ['promotions'] });                 
+            return RESTUtils.buildSuccessResponse({ data: promotions });
+
+        } catch (error) {
+            console.error(error);
+            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);
+        }
+    }
+
+    /**
+    * To search promotions to admin form
+    * @param {object} params data for search
+    * @param {Function(Error, object)} callback
+    */
 
     AuthorizationCode.remoteMethod('checkCode', {
         accepts: [
@@ -100,17 +134,17 @@ module.exports = function(AuthorizationCode) {
 
     AuthorizationCode.checkCode = async function (req, params) {
         try {
-            let authorization = await AuthorizationCode.findOne({where:{...params}, include:{'promotions':['assets']}})
+            let authorization = await AuthorizationCode.findOne({ where: { ...params }, include: { 'promotions': ['assets'] } })
 
-            if(!authorization ){
+            if (!authorization) {
                 authorization = "El codigo no fue encontrado."
             }
-            return RESTUtils.buildSuccessResponse({data:authorization});                                  
+            return RESTUtils.buildSuccessResponse({ data: authorization });
 
         } catch (error) {
             console.error(error);
-            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);       
-        }        
+            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);
+        }
     }
 
     /**
@@ -138,18 +172,18 @@ module.exports = function(AuthorizationCode) {
 
     AuthorizationCode.validateCode = async function (req, params) {
         try {
-            let authorization = await AuthorizationCode.findOne({where:{...params}, include:{'promotions':['assets']}})
+            let authorization = await AuthorizationCode.findOne({ where: { ...params }, include: { 'promotions': ['assets'] } })
 
-            if(authorization ){
-                await authorization.updateAttributes({status:'closed'});
-            }else{
-                authorization = "El codigo no fue encontrado."                
+            if (authorization) {
+                await authorization.updateAttributes({ status: 'closed' });
+            } else {
+                authorization = "El codigo no fue encontrado."
             }
-            return RESTUtils.buildSuccessResponse({data:authorization});                                  
+            return RESTUtils.buildSuccessResponse({ data: authorization });
 
         } catch (error) {
             console.error(error);
-            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);       
-        }        
+            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);
+        }
     }
 };
