@@ -51,7 +51,7 @@ module.exports = function (Promotions) {
                 include: ['assets', 'inventory', 'company']
             };
 
-            let data = await Promotions.find(filter); 
+            let data = await Promotions.find(filter);
             return RESTUtils.buildResponse(data, limitQuery);
 
         } catch (error) {
@@ -100,7 +100,7 @@ module.exports = function (Promotions) {
                 include: ['assets', 'inventory', 'company']
             };
 
-            let data = await Promotions.find(filter); 
+            let data = await Promotions.find(filter);
             return RESTUtils.buildResponse(data, limitQuery);
 
         } catch (error) {
@@ -135,6 +135,8 @@ module.exports = function (Promotions) {
     Promotions.search = async function (req, params) {
         let limitQuery = (params.pageSize) ? params.pageSize : 10;
         let page = (params.page) ? ((params.page - 1) * limitQuery) : 0;
+        const filtro = (params.filtro) ? params.filtro : '';
+
         let where = {}
         const today = new Date()
         today.setHours('00', '00', '00', '00')
@@ -142,6 +144,11 @@ module.exports = function (Promotions) {
         if (params.categoryId) {
             where = { categoriesId: params.categoryId }
         }
+        if (filtro) {
+            params.filtro = new RegExp('.*' + filtro + '.*', "i");
+            where = { description: { regexp: params.filtro } };
+        }
+
         where.start_date = { 'lte': today }
         where.end_date = { 'gte': today }
         where.quantity = { 'gt': 0 }
@@ -317,7 +324,7 @@ module.exports = function (Promotions) {
 
             if (data.length > top) {
                 data = getMostSalePromotions(data, top)
-             }
+            }
 
             return RESTUtils.buildSuccessResponse({ data });
 
