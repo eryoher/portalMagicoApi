@@ -99,8 +99,8 @@ module.exports = function (AuthorizationCode) {
     });
 
     AuthorizationCode.getMyPromotions = async function (req, params) {
-        try {                          
-            const promotions = await AuthorizationCode.find({ where: { ...params }, include: ['promotions'] });                 
+        try {
+            const promotions = await AuthorizationCode.find({ where: { ...params }, include: ['promotions'] });
             return RESTUtils.buildSuccessResponse({ data: promotions });
 
         } catch (error) {
@@ -180,6 +180,68 @@ module.exports = function (AuthorizationCode) {
                 authorization = "El codigo no fue encontrado."
             }
             return RESTUtils.buildSuccessResponse({ data: authorization });
+
+        } catch (error) {
+            console.error(error);
+            throw RESTUtils.getServerErrorResponse(ERROR_GENERIC);
+        }
+    }
+
+
+    /**
+   * To search Authoriztion codes by one requerimient
+   * @param {object} params data for search
+   * @param {Function(Error, object)} callback
+   */
+
+
+    AuthorizationCode.remoteMethod('search', {
+        accepts: [
+            { arg: 'req', type: 'object', http: { source: 'req' } },
+            { arg: 'params', type: 'object', 'description': 'all object data', 'http': { 'source': 'body' } },
+
+        ],
+        returns: {
+            type: 'object',
+            root: true,
+            description: 'response data of service'
+        },
+        description: 'Post current category',
+        http: {
+            verb: 'post'
+        },
+    });
+
+    AuthorizationCode.search = async function (req, params) {
+        const limitQuery = (params.pageSize) ? params.pageSize : 10;
+        const page = (params.page) ? ((params.page - 1) * limitQuery) : 0;
+        const filterData = [];
+
+        try {
+            const filter = (params.companyId) ? {
+                include: ['promotions', 'users']
+            } : {
+                limit: limitQuery,
+                skip: page,                
+                include: ['promotions', 'users']
+            };
+
+            const [total, data] = await Promise.all([
+                AuthorizationCode.count(),
+                AuthorizationCode.find(filter)
+            ])
+
+            if(params.companyId){
+                data.forEach(code => {     
+                    if (code.promotions() && code.promotions().companyId === params.companyId ) {
+                        filterData.push(code);
+                    }
+                });
+            }
+
+            const resultData = (filterData.length) ? filterData : data;
+
+            return RESTUtils.buildResponse(resultData, limitQuery, (params.page) ? params.page : page, (filterData.length) ? filterData.length : total  );
 
         } catch (error) {
             console.error(error);

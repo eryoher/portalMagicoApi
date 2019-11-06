@@ -54,6 +54,14 @@
       "model": "categories",
       "foreignKey": "categoriesId"
     },
+    "AuthorizationCode": {
+      "type": "hasMany",
+      "model": "AuthorizationCode",
+      "foreignKey": "",
+      "options": {
+        "nestRemoting": true
+      }
+    },
     "assets": {
       "type": "hasMany",
       "model": "assets",

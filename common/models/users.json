@@ -49,6 +49,10 @@
     "recoverCode": {
       "type": "string",
       "required": false
+    },
+    "companyId":{
+      "type": "number",
+      "required": true
     }
 
   },
