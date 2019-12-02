@@ -52,7 +52,7 @@
     },
     "companyId":{
       "type": "number",
-      "required": true
+      "required": false
     }
 
   },
