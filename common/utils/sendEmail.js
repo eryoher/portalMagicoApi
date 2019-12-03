@@ -4,12 +4,17 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const config = require('../../server/config.json');
+const MaskImp = require('mask-imp');
 const configSmtp = config.configSMTP;
 
 const sendBuyPromotionEmail = ( params ) => {        
     const transport = nodemailer.createTransport(configSmtp);    
     
-    readHTMLFile(__dirname + '/../../common/templates/template_buy_promotion_email.html', function(err, html) {            
+    readHTMLFile(__dirname + '/../../common/templates/template_buy_promotion_email.html', function(err, html) {    
+        const pattern = "#.###";
+        const options = { reverse: true };
+        const mask = MaskImp(pattern, options);    
+
         let template = handlebars.compile(html);            
         const discount = parseFloat( params.promotion.discount / 100 );
         const finalprice = parseFloat( params.promotion.price - parseFloat( params.promotion.price * discount ) );
@@ -19,8 +24,8 @@ const sendBuyPromotionEmail = ( params ) => {
             discount:params.promotion.discount,
             promotion:params.promotion.name,
             company:params.promotion.company.name, 
-            productprice:params.promotion.price,
-            finalprice: finalprice
+            productprice:mask.masked(params.promotion.price),
+            finalprice: mask.masked(finalprice)
         };
 
         const htmlToSend = template(replacements);          
